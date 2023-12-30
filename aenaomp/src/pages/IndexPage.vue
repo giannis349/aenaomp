@@ -7,7 +7,7 @@
     </div>
     <div class="col-6">
       <q-img
-        :src="selected_movie.poster"
+        :src="selected_movie.image"
         :ratio="16/9"
         spinner-color="primary"
         spinner-size="82px"
