@@ -1,6 +1,6 @@
 <template>
   <q-page class="flex flex-center">
-   <div class="row full-width">
+   <div class="row full-width" style="margin-top: 50px; min-height: 50vh;">
     <div class="col-6 text-white">
       <div class="q-ml-md q-mb-xl">{{ selected_movie.title }}</div>
       <div class="q-ml-md">{{ selected_movie.description }}</div>
@@ -9,13 +9,16 @@
       <q-img
         :src="selected_movie.image"
         :ratio="16/9"
+        height="250px"
+        fit
         spinner-color="primary"
         spinner-size="82px"
         class="q-ml-xl"
-        style="border-radius: 12px 0px 0px 12px; max-width: 95%;"
+        style="border-radius: 12px 0px 0px 12px;;"
       />
     </div>
    </div>
+   <div class="text-white row full-width justify-start q-pl-xl q-pb-lg" style="font-size: large; font-weight: 600;">All movies</div>
    <div class="row full-width">
     <q-img
     class="q-ml-lg pointer"
@@ -35,6 +38,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useCounterStore } from '/src/stores/example-store'
+import axios from 'axios'
 const store = useCounterStore();
 
 const allmovies = computed(() => {
