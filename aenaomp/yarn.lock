@@ -579,6 +579,24 @@ axios@^1.2.1:
     form-data "^4.0.0"
     proxy-from-env "^1.1.0"
 
+babylonjs-gltf2interface@^6.38.1:
+  version "6.38.1"
+  resolved "https://registry.yarnpkg.com/babylonjs-gltf2interface/-/babylonjs-gltf2interface-6.38.1.tgz#2a79da4e3617d22397d3bef4c1f548935a53bc18"
+  integrity sha512-kKvHu1SUSnerxhrERSimw8ts+uApxcEJoZu5pmKjbgGZGmQ2KRTnxa1h3mScdKlSoJ999emPQIabse8XzlwnOw==
+
+babylonjs-loaders@^6.38.1:
+  version "6.38.1"
+  resolved "https://registry.yarnpkg.com/babylonjs-loaders/-/babylonjs-loaders-6.38.1.tgz#1328ee5277ed2d8b915a5f14ae0e2e6554980a7c"
+  integrity sha512-KMMCObHnoN2dZ9+bf9C2Y2CB7reLxFDGfF6fphiswRzMdJklnKRjKvyCixUpWgCpKHRn3QrFWlCXkWiExCtxUA==
+  dependencies:
+    babylonjs "^6.38.1"
+    babylonjs-gltf2interface "^6.38.1"
+
+babylonjs@^6.38.1:
+  version "6.38.1"
+  resolved "https://registry.yarnpkg.com/babylonjs/-/babylonjs-6.38.1.tgz#bc1f1c17157300aaea3b10bc01801fe19a4bb376"
+  integrity sha512-NnHCts72IUAAWWZIibyrMvcq5c11tJ9A2UsyEoTATDFa7tvvOMhn1awC//8g0DcowQyAmeXENOiSeXr8BKFE+w==
+
 balanced-match@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.2.tgz#e83e3a7e3f300b34cb9d87f615fa0cbf357690ee"

@@ -4,22 +4,88 @@ export const useCounterStore = defineStore('counter', {
   state: () => ({
     counter: 0,
     allmovies: [
-      {
-        id: 1,
-        title: 'Indiana Jones and the Dial of Destiny',
-        description: 'Experience the return of legendary hero, Indiana Jones, in the fifth installment of this beloved swashbuckling series of films. Finding himself in a new era, approaching retirement, Indy wrestles with fitting into a world that seems to have outgrown him. But as the tentacles of an all-too-familiar evil return in the form of an old rival, Indy must don his hat and pick up his whip once more to make sure an ancient and powerful artifact doesn\'t fall into the wrong hands.',
-        poster: 'https://pbs.twimg.com/media/FxbxEb9aEAAqpOS?format=jpg&name=large',
-        image: 'https://media.cnn.com/api/v1/images/stellar/prod/221201171958-02-indiana-jones-and-the-dial-of-destiny.jpg?c=16x9&q=h_833,w_1480,c_fill',
-        video: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-      },
-      {
-        id: 2,
-        title: ' Indiana Jones and the Last Crusade',
-        description: 'An art collector appeals to Indiana Jones to embark on a search for the Holy Grail. He learns that another archaeologist has disappeared while searching for the precious goblet, and the missing man is his own father, Dr. Henry Jones. The artifact is much harder to find than they expected, and its powers are too much for those impure of heart',
-        poster: 'https://i.ebayimg.com/images/g/aE8AAOSwrx1juLT-/s-l1600.jpg',
-        image: 'https://images.bauerhosting.com/empire/2023/06/last-crusade-1.jpg?ar=16%3A9&fit=crop&crop=top&auto=format&w=768&q=80',
-        video: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
-      },
+//       {
+//         Actors
+// :
+// "Harrison Ford, Sean Connery, Alison Doody",
+// Awards
+// :
+// "Won 1 Oscar. 9 wins & 24 nominations total",
+// BoxOffice
+// :
+// "$197,171,806",
+// Country
+// :
+// "United States",
+// DVD
+// :
+// "28 Jan 2014",
+// Director
+// :
+// "Steven Spielberg",
+// Genre
+// :
+// "Action, Adventure",
+// Language
+// :
+// "English, German, Greek, Latin, Italian",
+// Metascore
+// :
+// "65",
+// Plot
+// :
+// "In 1938, after his father goes missing while pursuing the Holy Grail, Indiana Jones finds himself up against the Nazis again to stop them from obtaining its powers.",
+// Poster
+// :
+// "https://m.media-amazon.com/images/M/MV5BY2Q0ODg4ZmItNDZiYi00ZWY5LTg2NzctNmYwZjA5OThmNzE1XkEyXkFqcGdeQXVyMjM4MzQ4OTQ@._V1_SX300.jpg",
+// Production
+// :
+// "N/A",
+// Rated
+// :
+// "PG-13",
+// Ratings
+// :
+// (3) [
+//   {Source: 'Internet Movie Database', Value: '8.2/10'},
+// {Source: 'Rotten Tomatoes', Value: '84%'},
+// {Source: 'Metacritic', Value: '65/100'}
+// ],
+// Released
+// :
+// "24 May 1989",
+// Response
+// :
+// "True",
+// Runtime
+// :
+// "127 min",
+// Title
+// :
+// "Indiana Jones and the Last Crusade",
+// Type
+// :
+// "movie",
+// Website
+// :
+// "N/A",
+// Writer
+// :
+// "Jeffrey Boam, George Lucas, Menno Meyjes",
+// Year
+// :
+// "1989",
+// imdbID
+// :
+// "tt0097576",
+// imdbRating
+// :
+// "8.2",
+// imdbVotes
+// :
+// "801,550",
+//       }
+
     ]
   }),
   getters: {
@@ -29,5 +95,26 @@ export const useCounterStore = defineStore('counter', {
     increment() {
       this.counter++;
     },
+    getMoveInfo() {
+      const apiKey = '5e108139'; // Replace with your actual API key
+      const movieTitles = [' Indiana Jones and the Last Crusade', 'Indiana Jones and the Dial of Destiny', 'Inception', 'The Dark Knight', 'Interstellar', 'Indiana Jone']; // Replace with the movie title you want to search for
+
+      for (let index = 0; index < movieTitles.length; index++) {
+        const movieTitle = movieTitles[index];
+        const apiUrl = `http://www.omdbapi.com/?apikey=${apiKey}&t=${encodeURIComponent(movieTitle)}`;
+
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          console.log("movie data", data);
+          if (data.Response ==='True') {
+            this.allmovies.push(data)
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching movie data:', error);
+        });
+      }
+    }
   },
 });

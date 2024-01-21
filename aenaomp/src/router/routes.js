@@ -7,6 +7,20 @@ const routes = [
       { path: '', component: () => import('pages/IndexPage.vue') }
     ]
   },
+  {
+    path: '/movies',
+    component: () => import('layouts/FlatLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/MovePage.vue') }
+    ]
+  },
+  {
+    path: '/babylon',
+    component: () => import('layouts/FlatLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/BabylonPage.vue') }
+    ]
+  },
 
   // Always leave this as last one,
   // but you can also remove it
