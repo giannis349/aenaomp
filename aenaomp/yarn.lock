@@ -592,10 +592,22 @@ babylonjs-loaders@^6.38.1:
     babylonjs "^6.38.1"
     babylonjs-gltf2interface "^6.38.1"
 
+babylonjs-materials@^6.39.0:
+  version "6.39.0"
+  resolved "https://registry.yarnpkg.com/babylonjs-materials/-/babylonjs-materials-6.39.0.tgz#a61916ce60e06723d904314dba0c7950fbad7923"
+  integrity sha512-51Xp3IWmAr7xE09h7IJTru4A4P5gSJ30dZVmXr5Ndw/MKYuR7QBk47OsvNUXVJ2r0LPiWwZNKXLFEkju0Qv5dg==
+  dependencies:
+    babylonjs "^6.39.0"
+
 babylonjs@^6.38.1:
   version "6.38.1"
   resolved "https://registry.yarnpkg.com/babylonjs/-/babylonjs-6.38.1.tgz#bc1f1c17157300aaea3b10bc01801fe19a4bb376"
   integrity sha512-NnHCts72IUAAWWZIibyrMvcq5c11tJ9A2UsyEoTATDFa7tvvOMhn1awC//8g0DcowQyAmeXENOiSeXr8BKFE+w==
+
+babylonjs@^6.39.0:
+  version "6.39.0"
+  resolved "https://registry.yarnpkg.com/babylonjs/-/babylonjs-6.39.0.tgz#8e1835a9e8dc5adb0526f0127cc6ca6f9267b914"
+  integrity sha512-UpvmjSiSuj3kR21VM4zvZ6913NEuugEHARhSlQTs45bimnqgPUVNhUBHfgKNBdW/kegvNtuvl92za2g8XLPAlQ==
 
 balanced-match@^1.0.0:
   version "1.0.2"

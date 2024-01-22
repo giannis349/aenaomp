@@ -17,6 +17,7 @@
     "axios": "^1.2.1",
     "babylonjs": "^6.38.1",
     "babylonjs-loaders": "^6.38.1",
+    "babylonjs-materials": "^6.39.0",
     "pinia": "^2.0.11",
     "quasar": "^2.6.0",
     "vue": "^3.0.0",

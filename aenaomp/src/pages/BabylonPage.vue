@@ -1,57 +1,82 @@
-<!-- src/components/BabylonViewer.vue -->
+<!-- src/pages/Index.vue -->
 
 <template>
-  <canvas ref="canvas" style="width: 100%"></canvas>
+  <div id="app">
+    <canvas ref="renderCanvas"></canvas>
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
 import * as BABYLON from "babylonjs";
+import "babylonjs-materials";
+import "babylonjs-loaders";
 
-const canvas = ref(null);
+const imageUrls = [
+  "https://cdn2.schoovr.com/tiles/1619551680275aichberger-01601531_mvaP18070702/1619551680275aichberger-01601531_mvaP18070702.tiles/mobile_r.jpg",
+  "https://cdn2.schoovr.com/tiles/1619551680275aichberger-01601531_mvaP18070702/1619551680275aichberger-01601531_mvaP18070702.tiles/mobile_l.jpg",
+  "https://cdn2.schoovr.com/tiles/1619551680275aichberger-01601531_mvaP18070702/1619551680275aichberger-01601531_mvaP18070702.tiles/mobile_u.jpg",
+  "https://cdn2.schoovr.com/tiles/1619551680275aichberger-01601531_mvaP18070702/1619551680275aichberger-01601531_mvaP18070702.tiles/mobile_d.jpg",
+  "https://cdn2.schoovr.com/tiles/1619551680275aichberger-01601531_mvaP18070702/1619551680275aichberger-01601531_mvaP18070702.tiles/mobile_f.jpg",
+  "https://cdn2.schoovr.com/tiles/1619551680275aichberger-01601531_mvaP18070702/1619551680275aichberger-01601531_mvaP18070702.tiles/mobile_b.jpg",
+];
 
-onMounted(() => {
-  // Babylon.js initialization
-  const engine = new BABYLON.Engine(canvas.value);
+const preloadImage = (url) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = url;
+  });
+};
 
-  // Scene creation
+const createBabylonScene = async () => {
+  const preloadedImages = await Promise.all(imageUrls.map(preloadImage));
+
+  const canvas = ref("renderCanvas");
+  const engine = new BABYLON.Engine(canvas, true);
   const scene = new BABYLON.Scene(engine);
 
-  // Camera setup (for VR you might need a specific camera)
-  const camera = new BABYLON.FreeCamera(
-    "camera",
-    new BABYLON.Vector3(0, 0, -5),
+  const skyboxMaterial = new BABYLON.StandardMaterial("mobile", scene);
+  skyboxMaterial.backFaceCulling = false;
+  skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
+    preloadedImages,
     scene
   );
-  camera.setTarget(BABYLON.Vector3.Zero());
 
-  // VR experience helper
-  const vrHelper = scene.createDefaultVRExperience();
-
-  // Load 360 image
   const skybox = BABYLON.MeshBuilder.CreateBox(
-    "skyBox",
+    "mobile",
     { size: 1000.0 },
     scene
   );
-  const skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
-  skyboxMaterial.backFaceCulling = false;
-  skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
-    "/cube/mobile",
-    scene
-  );
-  skyboxMaterial.reflectionTexture.coordinatesMode =
-    BABYLON.Texture.SKYBOX_MODE;
-  skyboxMaterial.disableLighting = true;
   skybox.material = skyboxMaterial;
 
-  // Render loop
   engine.runRenderLoop(() => {
-    scene.render();
+    if (scene) {
+      scene.render();
+    }
   });
+
+  window.addEventListener("resize", () => {
+    engine.resize();
+  });
+};
+
+onMounted(() => {
+  createBabylonScene();
 });
 </script>
 
-<style scoped>
-/* Add any specific styling for your Babylon.js canvas */
+<style>
+#app {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+}
 </style>
