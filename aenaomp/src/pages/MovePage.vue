@@ -53,7 +53,7 @@
       spinner-color="primary"
       spinner-size="82px"
       style="width: 250px; height: 350px; border-radius: 12px;"
-      @click="playmovie(movie)"
+      @click="$router.push('/chosse')"
       @mouseover="select_movie(movie)"
       :style="selected_movie.Title === movie.Title ? 'box-shadow: 0px 0px 30px white': 'box-sandow: 0px 0px 0px white'"
     />
