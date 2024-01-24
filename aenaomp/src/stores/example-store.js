@@ -25,7 +25,7 @@ export const useCounterStore = defineStore("counter", {
 
       for (let index = 0; index < movieTitles.length; index++) {
         const movieTitle = movieTitles[index];
-        const apiUrl = `https://www.omdbapi.com/?apikey=${apiKey}&t=${encodeURIComponent(
+        const apiUrl = `https://www.omdbapi.com/?apikey=${apiKey}&plot=full&t=${encodeURIComponent(
           movieTitle
         )}`;
 

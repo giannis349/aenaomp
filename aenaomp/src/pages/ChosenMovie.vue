@@ -111,18 +111,18 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useCounterStore } from "/src/stores/example-store";
-import { useRoute } from "route";
+import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
 
 const store = useCounterStore();
-const Route = useroute();
+const Route = useRoute();
 onMounted(() => {
   // store.getMoveInfo();
 });
 const isplaying = ref(false);
 const mylist = ref([]);
 const allmovies = computed(() => {
-  return store.allmovies.filter((x = x.imbnID === Route.param.id));
+  return store.allmovies.filter((x) => x.imdbID === Route.params.id);
 });
 const selected_movie = ref(allmovies.value[0]);
 const playmovie = (m) => {
