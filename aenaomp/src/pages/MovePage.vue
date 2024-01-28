@@ -3,15 +3,15 @@
     <div
       class="row full-width"
       style="margin-top: 50px; min-height: 50vh"
-      v-if="!isplaying"
+      v-if="!isplaying && selected_movie"
     >
       <div class="col-6 text-white">
-        <div class="q-ml-md q-mb-xl">{{ selected_movie.Title }}</div>
-        <div class="q-ml-md">{{ selected_movie.Plot }}</div>
+        <div class="q-ml-md q-mb-xl">{{ selected_movie.title }}</div>
+        <div class="q-ml-md">{{ selected_movie.overview }}</div>
       </div>
       <div class="col-6">
         <q-img
-          :src="selected_movie.Poster"
+          :src="'https://image.tmdb.org/t/p/w780' + selected_movie.backdrop_path"
           :ratio="16 / 9"
           height="250px"
           fit
@@ -28,8 +28,8 @@
       v-if="isplaying"
     >
       <div class="col-6 text-white">
-        <div class="q-ml-md q-mb-xl">{{ selected_movie.Title }}</div>
-        <div class="q-ml-md">{{ selected_movie.Plot }}</div>
+        <div class="q-ml-md q-mb-xl">{{ selected_movie.title }}</div>
+        <div class="q-ml-md">{{ selected_movie.overview }}</div>
         <div class="q-ml-md">
           <q-btn
             class="q-ma-lg"
@@ -63,19 +63,19 @@
     >
       My list
     </div>
-    <div class="row full-width" v-if="mylist">
+    <div class="row full-width" v-if="mylist && selected_movie">
       <q-img
         class="q-ml-lg pointer"
         v-for="movie in mylist"
-        :key="movie.imdbID"
-        :src="movie.Poster"
+        :key="movie.id"
+        :src="'https://image.tmdb.org/t/p/w780' + movie.poster_path"
         spinner-color="primary"
         spinner-size="82px"
         style="width: 250px; height: 350px; border-radius: 12px"
         @click="playmovie(movie)"
         @mouseover="select_movie(movie)"
         :style="
-          selected_movie.Title === movie.Title
+        selected_movie && selected_movie.title === movie.title
             ? 'box-shadow: 0px 0px 30px white'
             : 'box-sandow: 0px 0px 0px white'
         "
@@ -91,15 +91,15 @@
       <q-img
         class="q-ma-lg pointer"
         v-for="movie in allmovies"
-        :key="movie.imdbID"
-        :src="movie.Poster"
+        :key="movie.id"
+        :src="'https://image.tmdb.org/t/p/w780' + movie.poster_path"
         spinner-color="primary"
         spinner-size="82px"
         style="width: 250px; height: 350px; border-radius: 12px"
-        @click="$router.push('/chossenmovie/' + movie.imdbID)"
+        @click="$router.push('/chossenmovie/' + movie.id)"
         @mouseover="select_movie(movie)"
         :style="
-          selected_movie.Title === movie.Title
+        selected_movie && selected_movie.title === movie.title
             ? 'box-shadow: 0px 0px 30px white'
             : 'box-sandow: 0px 0px 0px white'
         "
@@ -115,7 +115,7 @@ import axios from "axios";
 
 const store = useCounterStore();
 onMounted(() => {
-  // store.getMoveInfo();
+  store.getMoveInfo();
 });
 const isplaying = ref(false);
 const mylist = ref([]);

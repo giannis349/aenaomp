@@ -44,7 +44,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useCounterStore } from '/src/stores/example-store'
 
 const store = useCounterStore();
-onMounted(() => {
-  store.getMoveInfo();
-})
+// onMounted(() => {
+//   store.getMoveInfo();
+// })
 </script>
