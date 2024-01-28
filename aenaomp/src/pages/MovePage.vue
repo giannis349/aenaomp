@@ -68,7 +68,7 @@ import axios from 'axios'
 
 const store = useCounterStore();
 onMounted(() => {
-  // store.getMoveInfo();
+  store.getMoveInfo();
 })
 const isplaying = ref(false)
 const mylist = ref([])
