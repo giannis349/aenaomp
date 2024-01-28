@@ -1,29 +1,28 @@
 <template>
   <q-page
-    class=""
+    class="row"
     style="background-color: red; background-position: center; background-repeat: no-repeat; background-size: cover; position: relative;"
     :style="'background-image: url(https://image.tmdb.org/t/p/original' + selected_movie.backdrop_path + ');'"
     v-if="allmovies && allmovies.length > 0"
   >
-    <div class="absolute-bottom-left row items-end full-width">
-      <div class="col-3">
+    <div class="absolute-bottom-left row items-end full-width chosseninfo">
+      <div class="col-2 flex flex-center">
         <q-img
           :src="
             'https://image.tmdb.org/t/p/w780' + selected_movie.poster_path
           "
-          height="250px"
           fit
           spinner-color="primary"
           spinner-size="82px"
           class="q-ma-lg"
-          style="width: 250px; height: 350px; border-radius: 12px"
+          style="width: 150px; height: 220px; border-radius: 12px"
         />
       </div>
-      <div class="col-9 row text-white chosseninfo items-start" style="height: 20vw;">
-        <div class="q-ma-md" style="font-size: large; font-weight: 700;">{{ selected_movie.title }}</div>
-        <div class="q-ma-md" style="font-size: small; font-weight: 300;">{{ selected_movie.release_date }}</div>
-        <div class="q-ma-md" style="font-size: small; font-weight: 300;">{{ selected_movie.popularity }}</div>
-        <div class="q-ma-md">{{ selected_movie.overview }}</div>
+      <div class="col-10 row text-white  items-start" style="height: 20vw;">
+        <div class="col-12 q-ma-md" style="font-size: large; font-weight: 700;">{{ selected_movie.title }}</div>
+        <div class="col-12 q-ml-md" style="font-size: small; font-weight: 300;">{{ selected_movie.release_date }}</div>
+        <div class="col-12 q-ml-md" style="font-size: small; font-weight: 300;">{{ selected_movie.popularity }}</div>
+        <span class="col-12 q-pa-md">{{ selected_movie.overview }}</span>
       </div>
 
     </div>
