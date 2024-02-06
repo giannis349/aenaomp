@@ -11,36 +11,21 @@ import * as BABYLON from 'babylonjs';
 const canvas = ref(null);
 
 onMounted(() => {
-  // Babylon.js initialization
   const engine = new BABYLON.Engine(canvas.value);
-
-  // Scene creation
   const scene = new BABYLON.Scene(engine);
-
-  // Camera setup (for VR you might need a specific camera)
   const camera = new BABYLON.FreeCamera('camera', new BABYLON.Vector3(0, 0, -5), scene);
   camera.setTarget(BABYLON.Vector3.Zero());
-
-  // VR experience helper
   const vrHelper = scene.createDefaultVRExperience();
 
-  // Load 360 image
   const skybox = BABYLON.MeshBuilder.CreateBox('skyBox', { size: 1000.0 }, scene);
   const skyboxMaterial = new BABYLON.StandardMaterial('skyBox', scene);
   skyboxMaterial.backFaceCulling = false;
-  skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture([
-    'proxy?url=https://cdn2.schoovr.com/tiles/1619551680275aichberger-01601531_mvaP18070702/1619551680275aichberger-01601531_mvaP18070702.tiles/mobile_r.jpg',
-    'proxy?url=https://cdn2.schoovr.com/tiles/1619551680275aichberger-01601531_mvaP18070702/1619551680275aichberger-01601531_mvaP18070702.tiles/mobile_l.jpg',
-    'proxy?url=https://cdn2.schoovr.com/tiles/1619551680275aichberger-01601531_mvaP18070702/1619551680275aichberger-01601531_mvaP18070702.tiles/mobile_u.jpg',
-    'proxy?url=https://cdn2.schoovr.com/tiles/1619551680275aichberger-01601531_mvaP18070702/1619551680275aichberger-01601531_mvaP18070702.tiles/mobile_d.jpg',
-    'proxy?url=https://cdn2.schoovr.com/tiles/1619551680275aichberger-01601531_mvaP18070702/1619551680275aichberger-01601531_mvaP18070702.tiles/mobile_f.jpg',
-    'proxy?url=https://cdn2.schoovr.com/tiles/1619551680275aichberger-01601531_mvaP18070702/1619551680275aichberger-01601531_mvaP18070702.tiles/mobile_b.jpg',
-  ], scene);
+  skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
+    'https://cdn2.schoovr.com/tiles/1619551680275aichberger-01601531_mvaP18070702/1619551680275aichberger-01601531_mvaP18070702.tiles/', scene,  ["webgl_r.jpg", "webgl_u.jpg", "webgl_f.jpg", "webgl_l.jpg", "webgl_d.jpg", "webgl_b.jpg"]);
   skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
   skyboxMaterial.disableLighting = true;
   skybox.material = skyboxMaterial;
 
-  // Render loop
   engine.runRenderLoop(() => {
     scene.render();
   });
@@ -50,3 +35,4 @@ onMounted(() => {
 <style scoped>
 /* Add any specific styling for your Babylon.js canvas */
 </style>
+
