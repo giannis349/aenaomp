@@ -63,10 +63,10 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useCounterStore } from '/src/stores/example-store'
+import { useStore } from '/src/stores/example-store'
 import axios from 'axios'
 
-const store = useCounterStore();
+const store = useStore();
 onMounted(() => {
   store.getMoveInfo();
 })
