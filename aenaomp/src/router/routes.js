@@ -18,7 +18,7 @@ const routes = [
     path: '/babylon',
     component: () => import('layouts/FlatLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/BabylonPage.vue') }
+      { path: ':id', component: () => import('pages/BabylonPage.vue') }
     ]
   },
 

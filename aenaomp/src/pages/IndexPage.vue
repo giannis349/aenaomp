@@ -29,7 +29,7 @@
             border-radius: 18px;
             cursor: pointer;
           "
-          @click="$router.push('/babylon')"
+          @click="$router.push('/babylon/242')"
         >
           Test
         </div>
