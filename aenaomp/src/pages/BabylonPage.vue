@@ -1,7 +1,20 @@
 <!-- src/components/BabylonViewer.vue -->
 
 <template>
-  <canvas id="renderCanvas" style="width: 100%"></canvas>
+  <q-layout view="Lhh lpR fff" class="nowhite disable-select">
+    <canvas id="renderCanvas" style="width: 100%; height: 99vh;"> </canvas>
+    <div
+      class="absolute-bottom-left"
+      style="
+        top: 50%;
+        width: 50px;
+        height: 100px;
+        background-color: red;
+        z-index: 9999999999;
+      "
+      @click="next_scene()"
+    ></div>
+  </q-layout>
 </template>
 
 <script setup>
@@ -26,7 +39,7 @@ const start = () => {
   scene.value = new BABYLON.Scene(engine);
   camera.value = new BABYLON.FreeCamera(
     "camera",
-    new BABYLON.Vector3(0, 0, -1),
+    new BABYLON.Vector3(0, 0, 0),
     scene.value
   );
   camera.value.setTarget(BABYLON.Vector3.Zero());
@@ -34,7 +47,7 @@ const start = () => {
 
   const skybox = BABYLON.MeshBuilder.CreateBox(
     "skyBox",
-    { size: 10.0 },
+    { size: 10000.0 },
     scene.value
   );
   const skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene.value);
@@ -60,7 +73,7 @@ const start = () => {
   skyboxMaterial.disableLighting = true;
   skybox.material = skyboxMaterial;
   // let a = Math.PI / 1.435;
-  skybox.rotation.y = -Math.PI * 0.98;
+  skybox.rotation.y = Math.PI * 0.5;
   engine.runRenderLoop(() => {
     scene.value.render();
   });
@@ -87,14 +100,14 @@ const addpoi = async (data) => {
     scene.value
   );
   const aframePosition = {
-    x: data.position.position.x,
+    x: data.position.position.z,
     y: data.position.position.y / 10,
-    z: data.position.position.z,
+    z: data.position.position.x,
   };
   const babylonPosition = new BABYLON.Vector3(
     aframePosition.x,
     aframePosition.y,
-    -aframePosition.z
+    aframePosition.z
   );
 
   poi.position = babylonPosition;
@@ -152,9 +165,10 @@ const addpoi = async (data) => {
 };
 
 const item2 = computed(() => {
-  return Store.experiences.filter((x) => x.id === Number(Route.params.id));
+  return Store.experiences;
 });
 const scene_id = ref(Store.experiences[0].data.panos[0].id);
+
 const currentscene = computed(() => {
   return Store.experiences[0].data.panos.filter(
     (x) => x.id === scene_id.value
@@ -170,6 +184,23 @@ setTimeout(() => {
     }
   }
 }, 1000);
+
+const next_scene = () => {
+  console.log("next_scene: ", item2.value[0].data.panos);
+  const ind = item2.value[0].data.panos.findIndex(
+    (x) => x.id === currentscene.value.id
+  );
+  if (ind > -1) {
+    console.log("next_scene if: ", item2.value[0].data.panos[ind + 1].id)
+    scene_id.value = item2.value[0].data.panos[ind + 1].id
+    start();
+    for (let index = 0; index < currentscene.value.pois.length; index++) {
+      const poi = currentscene.value.pois[index];
+      console.log("poi", poi);
+      addpoi(poi);
+    }
+  }
+};
 </script>
 
 <style scoped>
