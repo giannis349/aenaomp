@@ -29,7 +29,7 @@
             border-radius: 18px;
             cursor: pointer;
           "
-          @click="$router.push('/babylon')"
+          @click="$router.push('/babylon/242')"
         >
           Test
         </div>
@@ -41,10 +41,10 @@
 <script setup>
 import router from 'src/router';
 import { ref, computed, onMounted } from 'vue'
-import { useCounterStore } from '/src/stores/example-store'
+import { useStore } from '/src/stores/example-store'
 
-const store = useCounterStore();
-// onMounted(() => {
-//   store.getMoveInfo();
-// })
+const store = useStore();
+onMounted(() => {
+  store.getMoveInfo();
+})
 </script>
