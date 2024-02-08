@@ -2,7 +2,7 @@
 
 <template>
   <q-layout view="Lhh lpR fff" class="nowhite disable-select">
-    <canvas id="renderCanvas" style="width: 100%; height: 99vh;"> </canvas>
+    <canvas id="renderCanvas" style="width: 100%; height: 99vh"> </canvas>
     <div
       class="absolute-bottom-left"
       style="
@@ -32,17 +32,22 @@ onMounted(() => {
   start();
 });
 const start = () => {
+  let canvas = document.getElementById("renderCanvas");
   const engine = new BABYLON.Engine(
     document.getElementById("renderCanvas"),
     true
   );
   scene.value = new BABYLON.Scene(engine);
-  camera.value = new BABYLON.FreeCamera(
+  camera.value = new BABYLON.VRDeviceOrientationFreeCamera(
     "camera",
     new BABYLON.Vector3(0, 0, 0),
     scene.value
   );
-  camera.value.setTarget(BABYLON.Vector3.Zero());
+  camera.value.setTarget(BABYLON.Vector3.Zero(0, 0, 0));
+  camera.value.angularSensibility = 10;
+  camera.value.moveSensibility = 10;
+  camera.value.attachControl(canvas, true);
+
   const vrHelper = scene.value.createDefaultVRExperience();
 
   const skybox = BABYLON.MeshBuilder.CreateBox(
@@ -191,8 +196,8 @@ const next_scene = () => {
     (x) => x.id === currentscene.value.id
   );
   if (ind > -1) {
-    console.log("next_scene if: ", item2.value[0].data.panos[ind + 1].id)
-    scene_id.value = item2.value[0].data.panos[ind + 1].id
+    console.log("next_scene if: ", item2.value[0].data.panos[ind + 1].id);
+    scene_id.value = item2.value[0].data.panos[ind + 1].id;
     start();
     for (let index = 0; index < currentscene.value.pois.length; index++) {
       const poi = currentscene.value.pois[index];
