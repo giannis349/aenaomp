@@ -86,7 +86,7 @@ const start = async function () {
   xrHelper.baseExperience.camera.fov = 0.8;
   skybox.position = xrHelper.baseExperience.camera.position;
   // let a = Math.PI / 1.435;
-  // skybox.rotation.y = Math.PI * 0.5;
+  skybox.rotation.y = 80.1;
 
   engine.runRenderLoop(() => {
     bjsscene.render();
@@ -113,15 +113,22 @@ const addpoi = async (data) => {
     { size: 0.35 },
     bjsscene
   );
+  let y = 0
+  if (data.position.position.y > 3.7) {
+    y = data.position.position.y
+  } else {
+    y = data.position.position.y * 0.1
+  }
+  console.log("dpp: ", data.position.position)
   const aframePosition = {
     x: data.position.position.z,
-    y: data.position.position.y / 10,
+    y: y ,
     z: data.position.position.x,
   };
   const babylonPosition = new BABYLON.Vector3(
-    aframePosition.x,
+    -aframePosition.x,
     aframePosition.y,
-    aframePosition.z
+    -aframePosition.z
   );
 
   poi.position = babylonPosition;
@@ -170,7 +177,6 @@ const addpoi = async (data) => {
   textplane.position.y = babylonPosition.y + 0.3;
   textplane.position.x = babylonPosition.x;
   textplane.position.z = babylonPosition.z;
-  // textplane.position = babylonPosition;
   textplane.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
   console.log("rot: ", camera.value.rotation);
 };
