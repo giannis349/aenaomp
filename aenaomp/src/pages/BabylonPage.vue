@@ -27,14 +27,14 @@ const Store = useStore();
 const Route = useRoute();
 const Router = useRouter();
 // const scene = ref(null);
-let bjsscene = null
+let bjsscene = null;
 // let xrHelper = null;
-let xrCamera = null
+let xrCamera = null;
 const camera = ref(null);
 onMounted(() => {
   start();
 });
-const start = async function() {
+const start = async function () {
   let canvas = document.getElementById("renderCanvas");
   const engine = new BABYLON.Engine(
     document.getElementById("renderCanvas"),
@@ -52,7 +52,7 @@ const start = async function() {
   camera.value.moveSensibility = 10;
   camera.value.attachControl(canvas, true);
   camera.value.upperRadiusLimit = camera.value.radius;
-camera.value.lowerRadiusLimit = camera.value.radius;
+  camera.value.lowerRadiusLimit = camera.value.radius;
   const vrHelper = bjsscene.createDefaultVRExperience();
   const xrHelper = await bjsscene.createDefaultXRExperienceAsync();
   xrCamera = xrHelper.baseExperience.camera;
@@ -91,7 +91,6 @@ camera.value.lowerRadiusLimit = camera.value.radius;
   engine.runRenderLoop(() => {
     bjsscene.render();
   });
-
 };
 
 const addpoi = async (data) => {
@@ -152,10 +151,7 @@ const addpoi = async (data) => {
     { width: poiTitle.length * 50, height: 136 },
     bjsscene
   );
-  const textMaterial = new BABYLON.StandardMaterial(
-    "textMaterial",
-    bjsscene
-  );
+  const textMaterial = new BABYLON.StandardMaterial("textMaterial", bjsscene);
 
   textMaterial.diffuseTexture = dynamicTexture;
   const context = dynamicTexture.getContext();
