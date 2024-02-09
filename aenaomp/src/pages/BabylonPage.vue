@@ -26,36 +26,42 @@ import * as BABYLON from "babylonjs";
 const Store = useStore();
 const Route = useRoute();
 const Router = useRouter();
-const scene = ref(null);
+// const scene = ref(null);
+let bjsscene = null
+// let xrHelper = null;
+let xrCamera = null
 const camera = ref(null);
 onMounted(() => {
   start();
 });
-const start = () => {
+const start = async function() {
   let canvas = document.getElementById("renderCanvas");
   const engine = new BABYLON.Engine(
     document.getElementById("renderCanvas"),
     true
   );
-  scene.value = new BABYLON.Scene(engine);
-  camera.value = new BABYLON.VRDeviceOrientationFreeCamera(
+  bjsscene = new BABYLON.Scene(engine);
+
+  camera.value = new BABYLON.FreeCamera(
     "camera",
     new BABYLON.Vector3(0, 0, 0),
-    scene.value
+    bjsscene
   );
-  camera.value.setTarget(BABYLON.Vector3.Zero(0, 0, 0));
+  camera.value.setTarget(BABYLON.Vector3.Zero());
   camera.value.angularSensibility = 10;
   camera.value.moveSensibility = 10;
   camera.value.attachControl(canvas, true);
-
-  const vrHelper = scene.value.createDefaultVRExperience();
-
+  camera.value.upperRadiusLimit = camera.value.radius;
+camera.value.lowerRadiusLimit = camera.value.radius;
+  const vrHelper = bjsscene.createDefaultVRExperience();
+  const xrHelper = await bjsscene.createDefaultXRExperienceAsync();
+  xrCamera = xrHelper.baseExperience.camera;
   const skybox = BABYLON.MeshBuilder.CreateBox(
     "skyBox",
     { size: 10000.0 },
-    scene.value
+    bjsscene
   );
-  const skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene.value);
+  const skyboxMaterial = new BABYLON.StandardMaterial("skyBox", bjsscene);
   skyboxMaterial.backFaceCulling = false;
   skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
     "https://cdn2.schoovr.com/tiles/" +
@@ -63,7 +69,7 @@ const start = () => {
       "/" +
       currentscene.value.data.name.split(".")[0] +
       ".tiles/",
-    scene.value,
+    bjsscene,
     [
       "webgl_r.jpg",
       "webgl_u.jpg",
@@ -77,32 +83,36 @@ const start = () => {
     BABYLON.Texture.SKYBOX_MODE;
   skyboxMaterial.disableLighting = true;
   skybox.material = skyboxMaterial;
+  xrHelper.baseExperience.camera.fov = 0.8;
+  skybox.position = xrHelper.baseExperience.camera.position;
   // let a = Math.PI / 1.435;
-  skybox.rotation.y = Math.PI * 0.5;
+  // skybox.rotation.y = Math.PI * 0.5;
+
   engine.runRenderLoop(() => {
-    scene.value.render();
+    bjsscene.render();
   });
+
 };
 
 const addpoi = async (data) => {
   console.log("poi position: ", data.title, data.position.position);
-  if (!scene.value) {
+  if (!bjsscene) {
     console.error("Scene is not initialized!");
     return;
   }
 
   // indicator
-  const material = new BABYLON.StandardMaterial("", scene.value);
+  const material = new BABYLON.StandardMaterial("", bjsscene);
   material.diffuseTexture = new BABYLON.Texture(
     "https://cdn2.schoovr.com/indicators/poi_white.svg",
-    scene.value
+    bjsscene
   );
   material.emissiveColor = new BABYLON.Color3(1, 1, 1);
   material.diffuseTexture.hasAlpha = true;
   const poi = BABYLON.MeshBuilder.CreatePlane(
     "plane",
     { size: 0.35 },
-    scene.value
+    bjsscene
   );
   const aframePosition = {
     x: data.position.position.z,
@@ -117,18 +127,18 @@ const addpoi = async (data) => {
 
   poi.position = babylonPosition;
   poi.material = material;
-  poi.actionManager = new BABYLON.ActionManager(scene.value);
+  poi.actionManager = new BABYLON.ActionManager(bjsscene);
   poi.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
   console.log("plane: ", poi.position);
   poi.actionManager.registerAction(
     new BABYLON.ExecuteCodeAction(
       BABYLON.ActionManager.OnPointerOverTrigger,
       function (ev) {
-        scene.value.hoverCursor = "pointer";
+        bjsscene.hoverCursor = "pointer";
       }
     )
   );
-  scene.value.onPointerPick = (event, pickInfo) => {
+  bjsscene.onPointerPick = (event, pickInfo) => {
     if (pickInfo.hit && pickInfo.pickedMesh === poi) {
       console.log("poi clicked!", poi);
     }
@@ -140,11 +150,11 @@ const addpoi = async (data) => {
   const dynamicTexture = new BABYLON.DynamicTexture(
     "dynamicTexture",
     { width: poiTitle.length * 50, height: 136 },
-    scene.value
+    bjsscene
   );
   const textMaterial = new BABYLON.StandardMaterial(
     "textMaterial",
-    scene.value
+    bjsscene
   );
 
   textMaterial.diffuseTexture = dynamicTexture;
@@ -158,7 +168,7 @@ const addpoi = async (data) => {
   const textplane = BABYLON.MeshBuilder.CreatePlane(
     "textPlane",
     { width: poiTitle.length / 10, height: 0.2 },
-    scene.value
+    bjsscene
   );
   textplane.material = textMaterial;
   textplane.position.y = babylonPosition.y + 0.3;
