@@ -26,36 +26,33 @@ import * as BABYLON from "babylonjs";
 const Store = useStore();
 const Route = useRoute();
 const Router = useRouter();
-// const scene = ref(null);
+// const bjsscene = ref(null);
 let bjsscene = null;
 // let xrHelper = null;
 let xrCamera = null;
-const camera = ref(null);
+let animCameraPosition = null;
+let animCameraTarget = null;
+let camera = null;
+let canvas = document.getElementById("renderCanvas");
 onMounted(() => {
   start();
 });
 const start = async function () {
-  let canvas = document.getElementById("renderCanvas");
   const engine = new BABYLON.Engine(
     document.getElementById("renderCanvas"),
     true
   );
   bjsscene = new BABYLON.Scene(engine);
 
-  camera.value = new BABYLON.FreeCamera(
+  camera = new BABYLON.FreeCamera(
     "camera",
     new BABYLON.Vector3(0, 0, 0),
     bjsscene
   );
-  camera.value.setTarget(BABYLON.Vector3.Zero());
-  camera.value.angularSensibility = 10;
-  camera.value.moveSensibility = 10;
-  camera.value.attachControl(canvas, true);
-  camera.value.upperRadiusLimit = camera.value.radius;
-  camera.value.lowerRadiusLimit = camera.value.radius;
+  camera.position = new BABYLON.Vector3(0, 1.6, 0);
+  camera.attachControl(canvas, true);
   const vrHelper = bjsscene.createDefaultVRExperience();
-  const xrHelper = await bjsscene.createDefaultXRExperienceAsync();
-  xrCamera = xrHelper.baseExperience.camera;
+
   const skybox = BABYLON.MeshBuilder.CreateBox(
     "skyBox",
     { size: 10000.0 },
@@ -83,18 +80,106 @@ const start = async function () {
     BABYLON.Texture.SKYBOX_MODE;
   skyboxMaterial.disableLighting = true;
   skybox.material = skyboxMaterial;
-  xrHelper.baseExperience.camera.fov = 0.8;
-  skybox.position = xrHelper.baseExperience.camera.position;
   // let a = Math.PI / 1.435;
   skybox.rotation.y = 80.1;
+
+  bjsscene.onPointerPick = (event, pickInfo) => {
+    if (pickInfo.hit && pickInfo.pickedMesh.ispoi) {
+      checkpoi(pickInfo.pickedMesh);
+    }
+  };
+  let easingFunction = new BABYLON.CubicEase(0.0);
+  easingFunction.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
+  animCameraTarget = new BABYLON.Animation(
+    "animCameraTarget",
+    "_setTarget",
+    30,
+    BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
+    BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+  );
+  animCameraPosition = new BABYLON.Animation(
+    "animCameraPosition",
+    "position",
+    30,
+    BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
+    BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+  );
+  animCameraTarget.setEasingFunction(easingFunction);
+  animCameraPosition.setEasingFunction(easingFunction);
+  bjsscene.onPointerDown = function (event, pickResult) {
+    clicker(event, pickResult);
+  };
 
   engine.runRenderLoop(() => {
     bjsscene.render();
   });
 };
 
+function clicker(evt, pickInfo) {
+  console.log("pickInfo: ", pickInfo);
+  if (pickInfo.pickedMesh) {
+    let meshi = pickInfo.pickedMesh;
+
+    //direction
+    let forward = new BABYLON.Vector3(0, 0, 1);
+    let direction = meshi.getDirection(forward);
+    direction.normalize();
+
+    //camera.getViewMatrix(true)
+    let target = camera.getTarget();
+
+    let pos = camera.position;
+
+    let move = meshi.absolutePosition.add(
+      direction.multiplyByFloats(10, 10, 10)
+    );
+
+    let positionKeys = [
+      {
+        frame: 0,
+        value: pos,
+      },
+      //At the animation key 100, the value of scaling is "1"
+      {
+        frame: 100,
+        value: move,
+      },
+    ];
+    animCameraPosition.setKeys(positionKeys);
+
+    let targetKeys = [
+      {
+        frame: 0,
+        value: target,
+      },
+      {
+        frame: 100,
+        value: meshi._absolutePosition,
+      },
+    ];
+
+    animCameraTarget.setKeys(targetKeys);
+
+    camera.animations = [];
+
+    camera.animations.push(animCameraPosition);
+    camera.animations.push(animCameraTarget), camera.detachControl(canvas);
+
+    bjsscene.beginDirectAnimation(
+      camera,
+      camera.animations,
+      0,
+      360,
+      false,
+      1,
+      () => {
+        camera.attachControl(canvas, true);
+        camera.lockedTarget = null;
+      }
+    );
+  }
+}
 const addpoi = async (data) => {
-  console.log("poi position: ", data.title, data.position.position);
   if (!bjsscene) {
     console.error("Scene is not initialized!");
     return;
@@ -113,16 +198,10 @@ const addpoi = async (data) => {
     { size: 0.35 },
     bjsscene
   );
-  let y = 0
-  if (data.position.position.y > 3.7) {
-    y = data.position.position.y
-  } else {
-    y = data.position.position.y * 0.1
-  }
-  console.log("dpp: ", data.position.position)
+  let y = data.position.position.y;
   const aframePosition = {
     x: data.position.position.z,
-    y: y ,
+    y: y,
     z: data.position.position.x,
   };
   const babylonPosition = new BABYLON.Vector3(
@@ -132,10 +211,12 @@ const addpoi = async (data) => {
   );
 
   poi.position = babylonPosition;
+  poi.ispoi = true;
+  poi.poiid = data.id;
+  poi.poiposition = data.position.position;
   poi.material = material;
   poi.actionManager = new BABYLON.ActionManager(bjsscene);
   poi.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
-  console.log("plane: ", poi.position);
   poi.actionManager.registerAction(
     new BABYLON.ExecuteCodeAction(
       BABYLON.ActionManager.OnPointerOverTrigger,
@@ -144,11 +225,6 @@ const addpoi = async (data) => {
       }
     )
   );
-  bjsscene.onPointerPick = (event, pickInfo) => {
-    if (pickInfo.hit && pickInfo.pickedMesh === poi) {
-      console.log("poi clicked!", poi);
-    }
-  };
 
   // Text
 
@@ -178,7 +254,6 @@ const addpoi = async (data) => {
   textplane.position.x = babylonPosition.x;
   textplane.position.z = babylonPosition.z;
   textplane.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
-  console.log("rot: ", camera.value.rotation);
 };
 
 const item2 = computed(() => {
@@ -193,30 +268,66 @@ const currentscene = computed(() => {
 });
 setTimeout(() => {
   if (item2.value) {
-    console.log("item2.value: ", item2.value);
     for (let index = 0; index < currentscene.value.pois.length; index++) {
       const poi = currentscene.value.pois[index];
-      console.log("poi", poi);
       addpoi(poi);
     }
   }
 }, 1000);
 
 const next_scene = () => {
-  console.log("next_scene: ", item2.value[0].data.panos);
   const ind = item2.value[0].data.panos.findIndex(
     (x) => x.id === currentscene.value.id
   );
   if (ind > -1) {
-    console.log("next_scene if: ", item2.value[0].data.panos[ind + 1].id);
     scene_id.value = item2.value[0].data.panos[ind + 1].id;
     start();
     for (let index = 0; index < currentscene.value.pois.length; index++) {
       const poi = currentscene.value.pois[index];
-      console.log("poi", poi);
       addpoi(poi);
     }
   }
+};
+let newCamera = null;
+const checkpoi = function (poi) {
+  console.log("checkpoi: ", camera);
+  // camera.detachControl(canvas, true)
+  // camera.setTarget(new BABYLON.Vector3(poi._position.x, poi._position.y, poi._position.z))
+  // camera.attachControl(canvas, true);
+  // return;
+  let direction = poi._position;
+  let pitchAngle = (Math.atan2(direction.y, direction.x) * 180.0) / Math.PI;
+  newCamera = new BABYLON.FreeCamera(
+    "newCamera",
+    new BABYLON.Vector3(0, 1.6, 0),
+    bjsscene
+  );
+  newCamera.rotation = new BABYLON.Vector3(0, 1.6, 0);
+  bjsscene.activeCamera = newCamera;
+  console.log("pitchAngle: ", pitchAngle);
+  newCamera.attachControl(canvas, true);
+  let targetRotationAngle = BABYLON.Tools.ToRadians(pitchAngle);
+  let animationKeys = [];
+  animationKeys.push({
+    frame: 0,
+    value: 1.6,
+  });
+  animationKeys.push({
+    frame: 100,
+    value: targetRotationAngle,
+  });
+
+  let rotationAnimation = new BABYLON.Animation(
+    "rotationAnimation",
+    "rotation.y",
+    100,
+    BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+    BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+  );
+
+  rotationAnimation.setKeys(animationKeys);
+  newCamera.animations.push(rotationAnimation);
+  bjsscene.beginAnimation(newCamera, 0, 100, false);
 };
 </script>
 
