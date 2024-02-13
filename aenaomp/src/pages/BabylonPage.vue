@@ -14,6 +14,17 @@
       "
       @click="next_scene()"
     ></div>
+    <div
+      class="absolute-bottom-right"
+      style="
+        top: 50%;
+        width: 50px;
+        height: 100px;
+        background-color: green;
+        z-index: 9999999999;
+      "
+      @click="setpos()"
+    ></div>
   </q-layout>
 </template>
 
@@ -44,13 +55,14 @@ const start = async function () {
   );
   bjsscene = new BABYLON.Scene(engine);
 
-  camera = new BABYLON.FreeCamera(
+  camera = new BABYLON.DeviceOrientationCamera(
     "camera",
     new BABYLON.Vector3(0, 0, 0),
     bjsscene
   );
   camera.position = new BABYLON.Vector3(0, 1.6, 0);
   camera.attachControl(canvas, true);
+  bjsscene.activeCamera = camera;
   const vrHelper = bjsscene.createDefaultVRExperience();
 
   const skybox = BABYLON.MeshBuilder.CreateBox(
@@ -88,7 +100,8 @@ const start = async function () {
       checkpoi(pickInfo.pickedMesh);
     }
   };
-
+  const fps = engine.getFps();
+  console.log("Current frame rate:", fps.toFixed(2), "FPS");
   engine.runRenderLoop(() => {
     bjsscene.render();
   });
@@ -141,6 +154,26 @@ const addpoi = async (data) => {
     )
   );
 
+  //bg
+
+  const bgmaterial = new BABYLON.StandardMaterial("", bjsscene);
+  bgmaterial.opacityTexture = new BABYLON.Texture(
+    "/icons/bg.png",
+    bjsscene
+  );
+  bgmaterial.emissiveColor = new BABYLON.Color3(0.11, 0.11, 0.11);
+
+  const bg = BABYLON.MeshBuilder.CreatePlane(
+    "bg",
+    { width: data.title.length / 10, height: 0.2, },
+    bjsscene
+  );
+  bg.material = bgmaterial
+  bg.position.y = babylonPosition.y + 0.3;
+  bg.position.x = babylonPosition.x;
+  bg.position.z = babylonPosition.z + 0.01;
+  bg.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
+
   // Text
 
   let poiTitle = data.title;
@@ -169,6 +202,8 @@ const addpoi = async (data) => {
   textplane.position.x = babylonPosition.x;
   textplane.position.z = babylonPosition.z;
   textplane.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
+
+
 };
 
 const item2 = computed(() => {
@@ -205,45 +240,115 @@ const next_scene = () => {
 };
 let newCamera = null;
 const checkpoi = function (poi) {
-  console.log("checkpoi: ", camera);
-  // camera.detachControl(canvas, true)
-  // camera.setTarget(new BABYLON.Vector3(poi._position.x, poi._position.y, poi._position.z))
-  // camera.attachControl(canvas, true);
-  return;
-  let direction = poi._position;
-  let pitchAngle = (Math.atan2(direction.y, direction.x) * 180.0) / Math.PI;
-  newCamera = new BABYLON.FreeCamera(
-    "newCamera",
-    new BABYLON.Vector3(0, 1.6, 0),
-    bjsscene
-  );
-  newCamera.rotation = new BABYLON.Vector3(0, 1.6, 0);
-  bjsscene.activeCamera = newCamera;
-  console.log("pitchAngle: ", pitchAngle);
-  newCamera.attachControl(canvas, true);
-  let targetRotationAngle = BABYLON.Tools.ToRadians(pitchAngle);
-  let animationKeys = [];
-  animationKeys.push({
-    frame: 0,
-    value: 1.6,
-  });
-  animationKeys.push({
-    frame: 100,
-    value: targetRotationAngle,
-  });
-
-  let rotationAnimation = new BABYLON.Animation(
-    "rotationAnimation",
-    "rotation.y",
-    100,
-    BABYLON.Animation.ANIMATIONTYPE_FLOAT,
-    BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
-  );
-
-  rotationAnimation.setKeys(animationKeys);
-  newCamera.animations.push(rotationAnimation);
-  bjsscene.beginAnimation(newCamera, 0, 100, false);
+  if (poi && poi._position) {
+    var duration = 100;
+    var fps = 50;
+    var newTargetPosition = new BABYLON.Vector3(
+      poi._position.x,
+      poi._position.y,
+      poi._position.z
+    );
+    BABYLON.Animation.CreateAndStartAnimation(
+      "transition",
+      bjsscene.activeCamera,
+      "target",
+      fps,
+      duration,
+      bjsscene.activeCamera.getTarget(),
+      newTargetPosition,
+      BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+    );
+  } else {
+    console.error("poi or poi._position is undefined");
+  }
 };
+let testpoi = {
+    "type": "select",
+    "data": {
+        "poi": {
+            "position": {
+                "_id": 2,
+                "position": {
+                    "x": -2.5760052617035254,
+                    "y": 1.603972759939657,
+                    "z": -2.8947040867787477
+                },
+                "indicator": {
+                    "width": 0.5,
+                    "height": 0.5,
+                    "frameDuration": 0.03,
+                    "hovered": false
+                },
+                "audio": {
+                    "enabled": false,
+                    "src": null
+                },
+                "tooltip": {
+                    "title": "Add a tooltip",
+                    "enabled": true,
+                    "permanent": true,
+                    "color": "#ffffff",
+                    "width": 4,
+                    "position": {
+                        "x": 0,
+                        "y": 0.3,
+                        "z": 0.5
+                    }
+                },
+                "pit": 0
+            },
+            "created_at": "2023-07-07T08:59:47.000Z",
+            "indicator": {
+                "id": 1,
+                "title": "default",
+                "data": {
+                    "name": "poi_white.svg",
+                    "rows": 30,
+                    "columns": 1,
+                    "frameDuration": 0.03,
+                    "loop": true,
+                    "width": 0.5,
+                    "height": 0.5
+                },
+                "animated": false,
+                "locale": "en",
+                "created_at": "2023-06-20T12:38:48.000Z",
+                "updated_at": "2023-06-20T12:38:48.000Z",
+                "localizations": []
+            },
+            "whos": "robotlab",
+            "panorama": 30,
+            "updated_at": "2023-07-07T13:39:58.000Z",
+            "title": "Great Pyramid of Giza",
+            "locale": "en",
+            "video": null,
+            "id": 24,
+            "image": "4/1688663898506Pyramid-(1).jpg",
+            "description": "The other large pyramid here was built for the Pharaoh Khufu, the father of Khafre. Khufu’s pyramid is the earliest of the three pyramids, and also the largest, at almost 150 meters (480 feet) in height. This pyramid is also known as the Great Pyramid of Egypt, and is the only one of the Seven Wonders of the Ancient World which remains."
+        },
+        "scene": 30
+    }
+}
+function setpos() {
+  let poi = testpoi.data.poi.position
+  var duration = 100;
+    var fps = 50;
+    var newTargetPosition = new BABYLON.Vector3(
+      -poi.position.x,
+      poi.position.y,
+      -poi.position.z
+    );
+    BABYLON.Animation.CreateAndStartAnimation(
+      "transition",
+      bjsscene.activeCamera,
+      "target",
+      fps,
+      duration,
+      bjsscene.activeCamera.getTarget(),
+      newTargetPosition,
+      BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+    );
+}
 </script>
 
 <style scoped>
