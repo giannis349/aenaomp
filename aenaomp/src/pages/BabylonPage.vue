@@ -49,7 +49,11 @@ const start = async function () {
     new BABYLON.Vector3(0, 0, 0),
     bjsscene
   );
-  camera.position = new BABYLON.Vector3(0, 1.6, 0);
+  // camera.position = new BABYLON.Vector3(0, 1.6, 0);
+  Object.defineProperty(camera, '_setTarget', {
+        set: function(v) { this.setTarget(v); }
+    });
+  camera.setTarget(BABYLON.Vector3.Zero());
   camera.attachControl(canvas, true);
   const vrHelper = bjsscene.createDefaultVRExperience();
 
@@ -294,7 +298,7 @@ const checkpoi = function (poi) {
   // camera.detachControl(canvas, true)
   // camera.setTarget(new BABYLON.Vector3(poi._position.x, poi._position.y, poi._position.z))
   // camera.attachControl(canvas, true);
-  // return;
+  return;
   let direction = poi._position;
   let pitchAngle = (Math.atan2(direction.y, direction.x) * 180.0) / Math.PI;
   newCamera = new BABYLON.FreeCamera(
