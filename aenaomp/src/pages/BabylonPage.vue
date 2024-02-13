@@ -49,11 +49,7 @@ const start = async function () {
     new BABYLON.Vector3(0, 0, 0),
     bjsscene
   );
-  // camera.position = new BABYLON.Vector3(0, 1.6, 0);
-  Object.defineProperty(camera, '_setTarget', {
-        set: function(v) { this.setTarget(v); }
-    });
-  camera.setTarget(BABYLON.Vector3.Zero());
+  camera.position = new BABYLON.Vector3(0, 1.6, 0);
   camera.attachControl(canvas, true);
   const vrHelper = bjsscene.createDefaultVRExperience();
 
@@ -92,97 +88,12 @@ const start = async function () {
       checkpoi(pickInfo.pickedMesh);
     }
   };
-  let easingFunction = new BABYLON.CubicEase(0.0);
-  easingFunction.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
-  animCameraTarget = new BABYLON.Animation(
-    "animCameraTarget",
-    "_setTarget",
-    30,
-    BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
-    BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
-  );
-  animCameraPosition = new BABYLON.Animation(
-    "animCameraPosition",
-    "position",
-    30,
-    BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
-    BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
-  );
-  animCameraTarget.setEasingFunction(easingFunction);
-  animCameraPosition.setEasingFunction(easingFunction);
-  bjsscene.onPointerDown = function (event, pickResult) {
-    clicker(event, pickResult);
-  };
 
   engine.runRenderLoop(() => {
     bjsscene.render();
   });
 };
 
-function clicker(evt, pickInfo) {
-  console.log("pickInfo: ", pickInfo);
-  if (pickInfo.pickedMesh) {
-    let meshi = pickInfo.pickedMesh;
-
-    //direction
-    let forward = new BABYLON.Vector3(0, 0, 1);
-    let direction = meshi.getDirection(forward);
-    direction.normalize();
-
-    //camera.getViewMatrix(true)
-    let target = camera.getTarget();
-
-    let pos = camera.position;
-
-    let move = meshi.absolutePosition.add(
-      direction.multiplyByFloats(10, 10, 10)
-    );
-
-    let positionKeys = [
-      {
-        frame: 0,
-        value: pos,
-      },
-      //At the animation key 100, the value of scaling is "1"
-      {
-        frame: 100,
-        value: move,
-      },
-    ];
-    animCameraPosition.setKeys(positionKeys);
-
-    let targetKeys = [
-      {
-        frame: 0,
-        value: target,
-      },
-      {
-        frame: 100,
-        value: meshi._absolutePosition,
-      },
-    ];
-
-    animCameraTarget.setKeys(targetKeys);
-
-    camera.animations = [];
-
-    camera.animations.push(animCameraPosition);
-    camera.animations.push(animCameraTarget), camera.detachControl(canvas);
-
-    bjsscene.beginDirectAnimation(
-      camera,
-      camera.animations,
-      0,
-      360,
-      false,
-      1,
-      () => {
-        camera.attachControl(canvas, true);
-        camera.lockedTarget = null;
-      }
-    );
-  }
-}
 const addpoi = async (data) => {
   if (!bjsscene) {
     console.error("Scene is not initialized!");
